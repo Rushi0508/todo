@@ -14,3 +14,5 @@ export interface DayGroup {
 export interface TodoStore {
   items: TodoItem[];
 }
+
+export type TodoFilter = "all" | "pending" | "completed";

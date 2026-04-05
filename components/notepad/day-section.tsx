@@ -13,17 +13,10 @@ interface DaySectionProps {
   focusId: string | null;
 }
 
-export function DaySection({
-  group,
-  onToggle,
-  onUpdateText,
-  onDelete,
-  onEnter,
-  focusId,
-}: DaySectionProps) {
+export function DaySection({ group, onToggle, onUpdateText, onDelete, onEnter, focusId }: DaySectionProps) {
   return (
     <div className="mb-5">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pt-3 pb-1 mb-0.5">
+      <div className="sticky top-14 z-10 bg-background/95 backdrop-blur-sm pt-3 pb-1 mb-0.5">
         <h2 className="text-xs font-semibold text-muted-foreground tracking-widest uppercase">
           {formatDateHeading(group.date)}
         </h2>

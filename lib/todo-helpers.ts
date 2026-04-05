@@ -1,4 +1,21 @@
-import type { TodoItem, DayGroup } from "./types";
+import type { TodoItem, DayGroup, TodoFilter } from "./types";
+
+export function filterTodos(items: TodoItem[], filter: TodoFilter): TodoItem[] {
+  switch (filter) {
+    case "pending":
+      return items.filter((item) => !item.completed);
+    case "completed":
+      return items.filter((item) => item.completed);
+    default:
+      return items;
+  }
+}
+
+export function searchTodos(items: TodoItem[], query: string): TodoItem[] {
+  const trimmed = query.trim().toLowerCase();
+  if (!trimmed) return items;
+  return items.filter((item) => item.text.toLowerCase().includes(trimmed));
+}
 
 export function groupTodosByDate(items: TodoItem[]): DayGroup[] {
   const groups = new Map<string, TodoItem[]>();
