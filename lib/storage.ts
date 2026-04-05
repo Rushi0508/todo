@@ -1,58 +1,51 @@
-import fs from "fs";
-import path from "path";
+import { Redis } from "@upstash/redis";
 import type { TodoItem, TodoStore } from "./types";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "todos.json");
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
+});
 
-function ensureDataDir(): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+const STORE_KEY = "todo_store";
+
+async function readStore(): Promise<TodoStore> {
+  const data = await redis.get<TodoStore>(STORE_KEY);
+  return data ?? { items: [] };
 }
 
-function readStore(): TodoStore {
-  ensureDataDir();
-  if (!fs.existsSync(DATA_FILE)) {
-    return { items: [] };
-  }
-  const raw = fs.readFileSync(DATA_FILE, "utf-8");
-  return JSON.parse(raw) as TodoStore;
+async function writeStore(store: TodoStore): Promise<void> {
+  await redis.set(STORE_KEY, store);
 }
 
-function writeStore(store: TodoStore): void {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), "utf-8");
+export async function getAllTodos(): Promise<TodoItem[]> {
+  const store = await readStore();
+  return store.items;
 }
 
-export function getAllTodos(): TodoItem[] {
-  return readStore().items;
-}
-
-export function addTodo(item: TodoItem): TodoItem {
-  const store = readStore();
+export async function addTodo(item: TodoItem): Promise<TodoItem> {
+  const store = await readStore();
   store.items.push(item);
-  writeStore(store);
+  await writeStore(store);
   return item;
 }
 
-export function updateTodo(
+export async function updateTodo(
   id: string,
   updates: Partial<Pick<TodoItem, "text" | "completed" | "completedAt">>
-): TodoItem | null {
-  const store = readStore();
+): Promise<TodoItem | null> {
+  const store = await readStore();
   const index = store.items.findIndex((item) => item.id === id);
   if (index === -1) return null;
   store.items[index] = { ...store.items[index], ...updates };
-  writeStore(store);
+  await writeStore(store);
   return store.items[index];
 }
 
-export function deleteTodo(id: string): boolean {
-  const store = readStore();
+export async function deleteTodo(id: string): Promise<boolean> {
+  const store = await readStore();
   const initialLength = store.items.length;
   store.items = store.items.filter((item) => item.id !== id);
   if (store.items.length === initialLength) return false;
-  writeStore(store);
+  await writeStore(store);
   return true;
 }
