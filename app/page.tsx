@@ -1,9 +1,9 @@
-import { Notepad } from "@/components/notepad/notepad";
+import { PasskeyForm } from "@/components/auth/passkey-form";
 
 export default function Home() {
   return (
     <main className="flex-1 flex flex-col">
-      <Notepad />
+      <PasskeyForm />
     </main>
   );
 }
