@@ -155,7 +155,7 @@ export function Notepad() {
         </div>
 
         {!isFiltering && (
-          <div className="sticky bottom-0 bg-background pt-2 pb-4">
+          <div className="sticky bottom-0 z-20 bg-background pt-2 pb-4">
             <div className="flex items-start gap-2 p-4 border rounded-md">
               <div className="size-4 shrink-0 mt-[3px] rounded-[4px] border border-dashed border-muted-foreground" />
               <textarea
